@@ -20,8 +20,8 @@ char who_wins() {
         }
     }
 
-    for (int i = 0; i < 3; ++i) {
-        for (int j = 0; j < 3; ++j) {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
             if (board [j][i] == board[j][i + 1] && board [j][i] == board[j][i + 2]) {
                 return board[j][i];
             }
@@ -31,10 +31,10 @@ char who_wins() {
     }
 
     if (board[0][0] == board[1][1] && board [0][0] == board[0][2]) {        //andere Lösung?
-        return ' ';
+        return board [0][0];
     }
     if (board[0][2] == board[1][1] && board [0][2] == board[2][0]) {
-        return ' ';
+        return board [0][2];
     }
 }
 
@@ -58,7 +58,7 @@ void printBoard() {
     printf("\n");
 }
 
-int freeSpace() {
+int freeSpace() {                                           // ZÄHLT ZUSAMMEN! BUG!
     int spaces = 0;
 
     for (int i = 0; i < 3; i++) {
@@ -125,6 +125,7 @@ int main() {
             printBoard();
             player_1_Turn();
             winner = who_wins();
+            freeSpace();
 
             if (winner != ' ' || freeSpace() == 9) {
                 break;
@@ -133,6 +134,7 @@ int main() {
             printBoard();
             player_2_Turn();
             winner = who_wins();
+            freeSpace();
 
             if (winner != ' ' || freeSpace() == 9) {
                 break;
@@ -140,7 +142,6 @@ int main() {
         }
         printBoard();
    // }
-
 
     return 0;
 }
