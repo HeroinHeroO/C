@@ -17,19 +17,61 @@ char player_two = 'O';
 char player_two_name[21] = "COMPUTER";
 int game_mode = 0;
 
-void playerfile() {
-    FILE* fptr;
-    char *player_one_name_ptr = player_one_name; //malloc?
+void player_stats_load() {
     char player_one_file[255];
+    strcpy(player_one_file, player_one_name);
+    strcat(player_one_file, ".txt");
+
+    FILE* fptr;
+    int num;
+    if ((fptr = fopen(player_one_file, "r+")) == NULL) {
+        printf("You seem to be new here, %s, good luck!\n", player_one_name);
+    }else {
+        for (int i = 0; i < 7; i++) {
+            fscanf(fptr, "%d", &num);
+            statistics_p1[i] = num;
+        }
+        if (fclose(fptr) != 0) {
+            printf("ERROR: Closing file was unsuccessful!\n");
+            exit(EXIT_FAILURE);
+        }
+        for (int i = 0; i < 7; ++i) { //prints array for test
+            printf("[%d]", statistics_p1[i]);
+        }
+    }
+}
+
+void player_stats_save() {
+    char player_one_file[255];
+    strcpy(player_one_file, player_one_name);
+    strcat(player_one_file, ".txt");
+
+    FILE* fptr;
+    if ((fptr = fopen(player_one_file, "w")) == NULL) {
+        fprintf(stderr, "ERROR: Cannot open file!\n");
+        return;
+    }
+    for (int i = 0; i < 7; i++) {
+        fprintf(fptr, "%d ", statistics_p1[i]);
+    }
+    if (game_mode != 3){
+        printf("Statistics saved!\n");
+    }
+
+    if (fclose(fptr) != 0) {
+        fprintf(stderr, "ERROR: Unable to close file!\n");
+        return;
+    }
+}
+
+void playeroptions() {
     char player_one_sign;
-    char *player_two_name_ptr = player_two_name;
-    char player_two_file[255];
 
     printf("Player One - Enter your name (max. 20 characters):");
     fgets(player_one_name, 20, stdin);
     player_one_name[strlen(player_one_name) - 1] = '\0';
-    sprintf(player_one_file, "%s.txt", player_one_name_ptr); //create file with player's name
-    fptr = fopen(player_one_file, "w");
+
+    player_stats_load();
 
     int tmpmode;
     printf("\nChoose a game mode!\n1: Human versus Human\n2: Human versus Machine\n3: BATTLE OF THE MACHINES!\nPress 4 to flee!\n");
@@ -62,37 +104,30 @@ void playerfile() {
         if (player_one_sign == 'x' || player_one_sign == 'X') {
             player_one = 'X';
             player_two = 'O';
+            statistics_p1[4]++;
+            statistics_p2[5]++;
         } else if (player_one_sign == 'o' || player_one_sign == 'O') {
             player_one = 'O';
             player_two = 'X';
+            statistics_p1[5]++;
+            statistics_p2[4]++;
         } else {
             printf("Invalid Sign! Please choose X or O!\n");
             goto sign;
         }
     }
-
     if (game_mode == 1) {
         printf("Player Two - Enter your name (max. 20 characters):");
-        fgets(player_two_name_ptr, 20, stdin);
+        fgets(player_two_name, 20, stdin);
         player_two_name[strlen(player_two_name) - 1] = '\0';
-        sprintf(player_two_file, "%s.txt", player_two_name_ptr);
-        fptr = fopen(player_two_file, "w");
     }
 
-    //print seven 0's into file if file is empty, load values from file into statistics array if not - BUGGED!!!
-    fptr = fopen(player_one_file, "w+");
-    for (int i = 0; i < 7; i++) {
-        if (fscanf(fptr, "%d") != 1) {
-            fprintf(fptr, "%d ", statistics_p1[i]);
-        } else {
-            fscanf(fptr, "%d", statistics_p1[i]);
-        }
-    }
-    fclose(fptr);
-    for (int i = 0; i < 7; ++i) { //TESTPRINT
+    for (int i = 0; i < 7; ++i) { //TEST PRINTOUT
         printf("[%d]", statistics_p1[i]);
     }
+    printf("\n");
 }
+
 
 char who_wins() {
     for (int i = 0; i < 3; i++) { //checks rows for matching signs
@@ -311,7 +346,7 @@ int main() {
 
     winner = ' ';
     fillFreeSpace();
-    playerfile();
+    playeroptions();
 
     while(winner == ' ' && freeSpace() != 9) {
         printBoard();
@@ -333,13 +368,18 @@ int main() {
 
     if (winner != ' ' || freeSpace() == 9) {
         if(winner == player_one){
-            printf("%s WINS!", player_one_name);
+            if (game_mode == 3) {
+                printf("The MACHINE wins!\n");
+            }else {
+                printf("%s WINS!\n", player_one_name);
+            }
         }else if(winner == player_two) {
-            printf("%s WINS!", player_two_name);
+            printf("%s WINS!\n", player_two_name);
         }else {
-            printf("IT'S A DRAW!");
+            printf("IT'S A DRAW!\n");
         }
     }
+    player_stats_save();
 
 
     return 0;
