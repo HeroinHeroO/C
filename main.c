@@ -13,7 +13,7 @@ int statistics_p1[7] = {0, 0, 0, 0, 0, 0, 0}; // Games played, wins, losses, tie
 char player_one = 'X';
 char player_one_name[21];
 int statistics_p2[7] = {0, 0, 0, 0, 0, 0, 0}; // Games played, wins, losses, ties, X games, O games, signs placed
-char player_two = 'O'; // CANNOT BE ' ' !!!
+char player_two = 'O';
 char player_two_name[21] = "COMPUTER";
 int game_mode = 0;
 
@@ -28,7 +28,7 @@ void playerfile() {
     printf("Player One - Enter your name (max. 20 characters):");
     fgets(player_one_name, 20, stdin);
     player_one_name[strlen(player_one_name) - 1] = '\0';
-    sprintf(player_one_file, "%s.txt", player_one_name_ptr);
+    sprintf(player_one_file, "%s.txt", player_one_name_ptr); //create file with player's name
     fptr = fopen(player_one_file, "w");
 
     int tmpmode;
@@ -78,16 +78,18 @@ void playerfile() {
         sprintf(player_two_file, "%s.txt", player_two_name_ptr);
         fptr = fopen(player_two_file, "w");
     }
+
+    //print seven 0's into file if file is empty, load values from file into statistics array if not - BUGGED!!!
     fptr = fopen(player_one_file, "w+");
     for (int i = 0; i < 7; i++) {
-        if (fscanf(fptr, "%d", statistics_p1[i]) != 1) {
+        if (fscanf(fptr, "%d") != 1) {
             fprintf(fptr, "%d ", statistics_p1[i]);
         } else {
             fscanf(fptr, "%d", statistics_p1[i]);
         }
     }
     fclose(fptr);
-    for (int i = 0; i < 7; ++i) {
+    for (int i = 0; i < 7; ++i) { //TESTPRINT
         printf("[%d]", statistics_p1[i]);
     }
 }
@@ -95,24 +97,20 @@ void playerfile() {
 char who_wins() {
     for (int i = 0; i < 3; i++) { //checks rows for matching signs
         if ((board[i][0] == board[i][1]) && (board[i][0] == board[i][2])) {
-            printf("wincon 1, symbol: %c, row: %d\n", board[i][0], i);
             return board[i][0];
         }
     }
 
     for (int i = 0; i < 3; i++) { //checks columns for matching signs
         if ((board[0][i] == board[1][i]) && (board[0][i] == board[2][i])) {
-            printf("wincon 2, symbol: %c, col: %d\n", board[0][i], i);
             return board[0][i];
         }
     }
 
     if ((board[0][0] == board[1][1]) && (board[0][0] == board[2][2])) {        //andere Lösung?
-        printf("wincon 3, symbol: %c, row: %d\n", board[0][0]);
         return board[0][0];
     }
     if ((board[0][2] == board[1][1]) && (board[0][2] == board[2][0])) {
-        printf("wincon 4, symbol: %c, row: %d\n", board[0][2]);
         return board[0][2];
     }
     return ' ';
@@ -203,7 +201,7 @@ void player_1_turn() {
             }
             // get position of best empty field
             int record[3] = {0, 0, 0};             //0 = rows, 1 = columns, 2 = diagonals
-            int lastbest = rand() % 9;                      //start on random field
+            int lastbest = rand() % 9;                      //start on random field OVERWRITES PLAYER TURN!!!
             for (int k = 0; k < 9; k++) {
                 //int j = computer_pick[k] % 3;               // for diagonals
                 int i = computer_pick[k] / 3;
