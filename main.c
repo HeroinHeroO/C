@@ -27,7 +27,7 @@ void player_stats_load() {
     FILE* fptr;
     int num;
     if ((fptr = fopen(player_one_file, "r+")) == NULL) {
-        sprintf(player_one_file, "%s.txt", player_one_name);
+        //sprintf(player_one_file, "%s.txt", player_one_name);
         printf("You seem to be new here, %s, good luck!\n", player_one_name);
     }else {
         for (int i = 0; i < 7; i++) {
@@ -38,9 +38,10 @@ void player_stats_load() {
             printf("ERROR: Closing file was unsuccessful!\n");
             exit(EXIT_FAILURE);
         }
+        for (int i = 0; i < 7; ++i) { //prints array for test
+            printf("[%d]", statistics_p1[i]);
+        }
     }
-
-
 }
 
 void player_stats_save() {
@@ -54,7 +55,7 @@ void player_stats_save() {
         return;
     }
     for (int i = 0; i < 7; i++) {
-        fprintf(fptr, "%d", statistics_p1[i]);
+        fprintf(fptr, "%d ", statistics_p1[i]);
     }
     printf("Statistics saved!\n");
 
@@ -366,7 +367,11 @@ int main() {
 
     if (winner != ' ' || freeSpace() == 9) {
         if(winner == player_one){
-            printf("%s WINS!", player_one_name);
+            if (game_mode == 3) {
+                printf("THE COMPUTER WINS!");
+            }else {
+                printf("%s WINS!", player_one_name);
+            }
         }else if(winner == player_two) {
             //printf("%s WINS!", player_two_name);
         }else {
