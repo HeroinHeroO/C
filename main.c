@@ -14,8 +14,9 @@ char player_one = 'X';
 char player_one_name[21];
 int statistics_p2[7] = {0, 0, 0, 0, 0, 0, 0}; // Games played, wins, losses, ties, X games, O games, signs placed
 char player_two = 'O'; // CANNOT BE ' ' !!!
-char player_two_name[21] = "COMPUTER";
-int game_mode = 0;
+// char computer_one = 'O';
+// char computer_two = 'X';
+int game_mode = 1;
 
 void playerfile() {
     FILE* fptr;
