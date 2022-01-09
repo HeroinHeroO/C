@@ -6,7 +6,6 @@
 
 /*IDEAS: Win/Lose Sprüche random aus einem array. -> unterschiedlich bei PvP und PvC (PvC muss Spieler ansprechen):
  * "The mind is nothing more than an involuntary ejaculation of the unavoidable entropy of infinite space."
- * Random delay bei computer_turns.
 */
 char board[3][3];
 int statistics_p1[7] = {0, 0, 0, 0, 0, 0, 0}; // Games played, wins, losses, ties, X games, O games, signs placed
@@ -17,22 +16,26 @@ char player_two = 'O';
 char player_two_name[21] = "COMPUTER";
 int game_mode = 0;
 
-void player_stats_load() {
-    char player_one_file[255];
+void player1_stats_load() {
+    char player_one_file[25];
     strcpy(player_one_file, player_one_name);
     strcat(player_one_file, ".txt");
 
     FILE* fptr;
     int num;
-    if ((fptr = fopen(player_one_file, "r+")) == NULL) {
+    if ((fptr = fopen(player_one_file, "r")) == NULL) {
         printf("You seem to be new here, %s, good luck!\n", player_one_name);
     }else {
         for (int i = 0; i < 7; i++) {
             fscanf(fptr, "%d", &num);
             statistics_p1[i] = num;
         }
+        if (fflush(fptr) != 0) {
+            fprintf(stderr, "ERROR: Flushing file buffer was unsuccessful!\n");
+            exit(EXIT_FAILURE);
+        }
         if (fclose(fptr) != 0) {
-            printf("ERROR: Closing file was unsuccessful!\n");
+            fprintf(stderr, "ERROR: Closing file was unsuccessful!\n");
             exit(EXIT_FAILURE);
         }
         for (int i = 0; i < 7; ++i) { //prints array for test
@@ -41,8 +44,36 @@ void player_stats_load() {
     }
 }
 
+void player2_stats_load() {
+    char player_two_file[25];
+    strcpy(player_two_file, player_two_name);
+    strcat(player_two_file, ".txt");
+
+    FILE* fptr;
+    int num;
+    if ((fptr = fopen(player_two_file, "r")) == NULL) {
+        printf("You seem to be new here, %s, good luck!\n", player_two_name);
+    }else {
+        for (int i = 0; i < 7; i++) {
+            fscanf(fptr, "%d", &num);
+            statistics_p2[i] = num;
+        }
+        if (fflush(fptr) != 0) {
+            fprintf(stderr, "ERROR: Flushing file buffer was unsuccessful!\n");
+            exit(EXIT_FAILURE);
+        }
+        if (fclose(fptr) != 0) {
+            fprintf(stderr, "ERROR: Closing file was unsuccessful!\n");
+            exit(EXIT_FAILURE);
+        }
+        for (int i = 0; i < 7; ++i) { //prints array for test
+            printf("[%d]", statistics_p2[i]);
+        }
+    }
+}
+
 void player_stats_save() {
-    char player_one_file[255];
+    char player_one_file[25];
     strcpy(player_one_file, player_one_name);
     strcat(player_one_file, ".txt");
 
@@ -57,10 +88,35 @@ void player_stats_save() {
     if (game_mode != 3){
         printf("Statistics saved!\n");
     }
-
+    if (fclose(fptr) != 0) {
+        fprintf(stderr, "ERROR: Closing file was unsuccessful!\n");
+        exit(EXIT_FAILURE);
+    }
     if (fclose(fptr) != 0) {
         fprintf(stderr, "ERROR: Unable to close file!\n");
         return;
+    }
+    if (game_mode == 1) {
+        char player_two_file[25];
+        strcpy(player_two_file, player_two_name);
+        strcat(player_two_file, ".txt");
+
+        if ((fptr = fopen(player_two_file, "w")) == NULL) {
+            fprintf(stderr, "ERROR: Cannot open file!\n");
+            return;
+        }
+        for (int i = 0; i < 7; i++) {
+            fprintf(fptr, "%d ", statistics_p2[i]);
+        }
+            printf("Statistics saved!\n");
+        }
+        if (fclose(fptr) != 0) {
+            fprintf(stderr, "ERROR: Closing file was unsuccessful!\n");
+            exit(EXIT_FAILURE);
+        }
+        if (fclose(fptr) != 0) {
+            fprintf(stderr, "ERROR: Unable to close file!\n");
+            return;
     }
 }
 
@@ -71,7 +127,9 @@ void playeroptions() {
     fgets(player_one_name, 20, stdin);
     player_one_name[strlen(player_one_name) - 1] = '\0';
 
-    player_stats_load();
+    if (game_mode != 3) {
+        player1_stats_load();
+    }
 
     int tmpmode;
     printf("\nChoose a game mode!\n1: Human versus Human\n2: Human versus Machine\n3: BATTLE OF THE MACHINES!\nPress 4 to flee!\n");
@@ -120,6 +178,8 @@ void playeroptions() {
         printf("Player Two - Enter your name (max. 20 characters):");
         fgets(player_two_name, 20, stdin);
         player_two_name[strlen(player_two_name) - 1] = '\0';
+
+        player2_stats_load();
     }
 
     for (int i = 0; i < 7; ++i) { //TEST PRINTOUT
@@ -236,7 +296,7 @@ void player_1_turn() {
             }
             // get position of best empty field
             int record[3] = {0, 0, 0};             //0 = rows, 1 = columns, 2 = diagonals
-            int lastbest = rand() % 9;                      //start on random field OVERWRITES PLAYER TURN!!!
+            int lastbest = rand() % 9;                      //start on random field OVERWRITES PLAYER TURN!!! do While-Loop (computerpick[lastbest] == 0)
             for (int k = 0; k < 9; k++) {
                 //int j = computer_pick[k] % 3;               // for diagonals
                 int i = computer_pick[k] / 3;
@@ -312,7 +372,12 @@ void player_2_turn() {
                 }
                 // get position of best empty field
                 int record[3] = {0, 0, 0};             //0 = rows, 1 = columns, 2 = diagonals
-                int lastbest = rand() % 9;                      //start on random field - OVERWRITES PLAYER TURN!
+                int lastbest;
+
+                do {
+                    lastbest = rand() % 9;                                   //start on random field - OVERWRITES PLAYER TURN!
+                } while (computer_pick[lastbest == 0]);
+
                 for (int k = 0; k < 9; k++) {
                     //int j = computer_pick[k] % 3;               // for diagonals
                     int i = computer_pick[k] / 3;
@@ -379,8 +444,8 @@ int main() {
             printf("IT'S A DRAW!\n");
         }
     }
-    player_stats_save();
 
+        player_stats_save();
 
     return 0;
 }
