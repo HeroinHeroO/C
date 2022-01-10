@@ -21,25 +21,22 @@ void player1_stats_load() {
     strcpy(player_one_file, player_one_name);
     strcat(player_one_file, ".txt");
 
-    FILE* fptr;
+    FILE *fptr;
     int num;
     if ((fptr = fopen(player_one_file, "r")) == NULL) {
         printf("You seem to be new here, %s, good luck!\n", player_one_name);
-    }else {
+    } else {
         for (int i = 0; i < 7; i++) {
             fscanf(fptr, "%d", &num);
             statistics_p1[i] = num;
         }
         if (fflush(fptr) != 0) {
-            fprintf(stderr, "ERROR: Flushing file buffer was unsuccessful!\n");
-            exit(EXIT_FAILURE);
+            fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", player_one_name);
+            return;
         }
         if (fclose(fptr) != 0) {
-            fprintf(stderr, "ERROR: Closing file was unsuccessful!\n");
-            exit(EXIT_FAILURE);
-        }
-        for (int i = 0; i < 7; ++i) { //prints array for test
-            printf("[%d]", statistics_p1[i]);
+            fprintf(stderr, "ERROR: Closing statistics file for %s was unsuccessful!\n", player_one_name);
+            return;
         }
     }
 }
@@ -49,25 +46,22 @@ void player2_stats_load() {
     strcpy(player_two_file, player_two_name);
     strcat(player_two_file, ".txt");
 
-    FILE* fptr;
+    FILE* fptr2;
     int num;
-    if ((fptr = fopen(player_two_file, "r")) == NULL) {
+    if ((fptr2 = fopen(player_two_file, "r")) == NULL) {
         printf("You seem to be new here, %s, good luck!\n", player_two_name);
     }else {
         for (int i = 0; i < 7; i++) {
-            fscanf(fptr, "%d", &num);
+            fscanf(fptr2, "%d", &num);
             statistics_p2[i] = num;
         }
-        if (fflush(fptr) != 0) {
-            fprintf(stderr, "ERROR: Flushing file buffer was unsuccessful!\n");
-            exit(EXIT_FAILURE);
+        if (fflush(fptr2) != 0) {
+            fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", player_two_name);
+            return;
         }
-        if (fclose(fptr) != 0) {
-            fprintf(stderr, "ERROR: Closing file was unsuccessful!\n");
-            exit(EXIT_FAILURE);
-        }
-        for (int i = 0; i < 7; ++i) { //prints array for test
-            printf("[%d]", statistics_p2[i]);
+        if (fclose(fptr2) != 0) {
+            fprintf(stderr, "ERROR: Closing statistics file for %s was unsuccessful!\n", player_one_name);
+            return;
         }
     }
 }
@@ -79,43 +73,44 @@ void player_stats_save() {
 
     FILE* fptr;
     if ((fptr = fopen(player_one_file, "w")) == NULL) {
-        fprintf(stderr, "ERROR: Cannot open file!\n");
+        fprintf(stderr, "ERROR: Cannot open statistics file for %s!\n", player_one_name);
         return;
     }
     for (int i = 0; i < 7; i++) {
         fprintf(fptr, "%d ", statistics_p1[i]);
     }
     if (game_mode != 3){
-        printf("Statistics saved!\n");
+        printf("Statistics for %s saved!\n", player_one_name);
     }
-    if (fclose(fptr) != 0) {
-        fprintf(stderr, "ERROR: Closing file was unsuccessful!\n");
-        exit(EXIT_FAILURE);
-    }
-    if (fclose(fptr) != 0) {
-        fprintf(stderr, "ERROR: Unable to close file!\n");
+    if (fflush(fptr) != 0) {
+        fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", player_one_name);
         return;
     }
+    if (fclose(fptr) != 0) {
+        fprintf(stderr, "ERROR: Closing statistics file for %s was unsuccessful!\n", player_one_name);
+        return;
+    }
+    FILE* fptr2;
     if (game_mode == 1) {
         char player_two_file[25];
         strcpy(player_two_file, player_two_name);
         strcat(player_two_file, ".txt");
 
-        if ((fptr = fopen(player_two_file, "w")) == NULL) {
-            fprintf(stderr, "ERROR: Cannot open file!\n");
+        if ((fptr2 = fopen(player_two_file, "w")) == NULL) {
+            fprintf(stderr, "ERROR: Cannot open statistics file for %s!\n", player_two_name);
             return;
         }
         for (int i = 0; i < 7; i++) {
-            fprintf(fptr, "%d ", statistics_p2[i]);
+            fprintf(fptr2, "%d ", statistics_p2[i]);
         }
-            printf("Statistics saved!\n");
+            printf("Statistics for %s saved!\n", player_two_name);
         }
-        if (fclose(fptr) != 0) {
-            fprintf(stderr, "ERROR: Closing file was unsuccessful!\n");
-            exit(EXIT_FAILURE);
+        if (fflush(fptr2) != 0) {
+            fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", player_two_name);
+            return;
         }
-        if (fclose(fptr) != 0) {
-            fprintf(stderr, "ERROR: Unable to close file!\n");
+        if (fclose(fptr2) != 0) {
+            fprintf(stderr, "ERROR: Closing statistics file for %d was unsuccessful!\n", player_one_name);
             return;
     }
 }
@@ -180,10 +175,6 @@ void playeroptions() {
         player_two_name[strlen(player_two_name) - 1] = '\0';
 
         player2_stats_load();
-    }
-
-    for (int i = 0; i < 7; ++i) { //TEST PRINTOUT
-        printf("[%d]", statistics_p1[i]);
     }
     printf("\n");
 }
@@ -258,6 +249,7 @@ void player_1_turn() {
                 printf("This field has already been used!\n");
             } else {
                 board[x][y] = player_one;
+                statistics_p1[6]++;
                 break;
             }
         }else {                                         //checks all empty field for number of adjecent (computer) player signs
@@ -296,7 +288,12 @@ void player_1_turn() {
             }
             // get position of best empty field
             int record[3] = {0, 0, 0};             //0 = rows, 1 = columns, 2 = diagonals
-            int lastbest = rand() % 9;                      //start on random field OVERWRITES PLAYER TURN!!! do While-Loop (computerpick[lastbest] == 0)
+            int lastbest;                      //start on random field OVERWRITES PLAYER TURN!!! do While-Loop (computerpick[lastbest] == 0)
+
+            do {
+                lastbest = rand() % 9;
+            } while (computer_pick[lastbest] == 1);
+
             for (int k = 0; k < 9; k++) {
                 //int j = computer_pick[k] % 3;               // for diagonals
                 int i = computer_pick[k] / 3;
@@ -334,6 +331,7 @@ void player_2_turn() {
                     printf("This field has already been used!\n");
                 } else {
                     board[x][y] = player_two;
+                    statistics_p2[6]++;
                     break;
                 }
             } else {                                         //checks all empty field for number of adjecent (computer) player signs
@@ -376,7 +374,7 @@ void player_2_turn() {
 
                 do {
                     lastbest = rand() % 9;                                   //start on random field - OVERWRITES PLAYER TURN!
-                } while (computer_pick[lastbest == 0]);
+                } while (computer_pick[lastbest] == 1);
 
                 for (int k = 0; k < 9; k++) {
                     //int j = computer_pick[k] % 3;               // for diagonals
@@ -437,11 +435,29 @@ int main() {
                 printf("The MACHINE wins!\n");
             }else {
                 printf("%s WINS!\n", player_one_name);
+                statistics_p1[0]++;
+                statistics_p1[1]++;
+                if (game_mode == 1) {
+                    statistics_p2[0]++;
+                    statistics_p2[2]++;
+                }
             }
         }else if(winner == player_two) {
             printf("%s WINS!\n", player_two_name);
+            if (game_mode == 1) {
+                statistics_p1[0]++;
+                statistics_p1[2]++;
+                statistics_p2[0]++;
+                statistics_p2[1]++;
+            }
         }else {
             printf("IT'S A DRAW!\n");
+            if (game_mode == 1) {
+                statistics_p1[0]++;
+                statistics_p1[3]++;
+                statistics_p2[0]++;
+                statistics_p2[3]++;
+            }
         }
     }
 
