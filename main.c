@@ -2,11 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-#include <windows.h>
+//#include <windows.h>
 
-/*IDEAS: Win/Lose Sprüche random aus einem array. -> unterschiedlich bei PvP und PvC (PvC muss Spieler ansprechen):
- * "The mind is nothing more than an involuntary ejaculation of the unavoidable entropy of infinite space."
-*/
 char board[3][3];
 int statistics_p1[7] = {0, 0, 0, 0, 0, 0, 0}; // Games played, wins, losses, ties, X games, O games, signs placed
 char player_one = 'X';
@@ -90,8 +87,9 @@ void player_stats_save() {
         fprintf(stderr, "ERROR: Closing statistics file for %s was unsuccessful!\n", player_one_name);
         return;
     }
-    FILE* fptr2;
+
     if (game_mode == 1) {
+        FILE *fptr2;
         char player_two_file[25];
         strcpy(player_two_file, player_two_name);
         strcat(player_two_file, ".txt");
@@ -103,8 +101,8 @@ void player_stats_save() {
         for (int i = 0; i < 7; i++) {
             fprintf(fptr2, "%d ", statistics_p2[i]);
         }
-            printf("Statistics for %s saved!\n", player_two_name);
-        }
+        printf("Statistics for %s saved!\n", player_two_name);
+
         if (fflush(fptr2) != 0) {
             fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", player_two_name);
             return;
@@ -112,6 +110,7 @@ void player_stats_save() {
         if (fclose(fptr2) != 0) {
             fprintf(stderr, "ERROR: Closing statistics file for %d was unsuccessful!\n", player_one_name);
             return;
+        }
     }
 }
 
@@ -432,9 +431,9 @@ int main() {
     if (winner != ' ' || freeSpace() == 9) {
         if(winner == player_one){
             if (game_mode == 3) {
-                printf("The MACHINE wins!\n");
+                printf("The MACHINE wins!\n\nThe mind is nothing more than an involuntary ejaculation of the unavoidable entropy of infinite space.");
             }else {
-                printf("%s WINS!\n", player_one_name);
+                printf("%s WINS!\n\nAfter the sacrificing to the great Cthulhu comes the good feeling!", player_one_name);
                 statistics_p1[0]++;
                 statistics_p1[1]++;
                 if (game_mode == 1) {
@@ -443,7 +442,7 @@ int main() {
                 }
             }
         }else if(winner == player_two) {
-            printf("%s WINS!\n", player_two_name);
+            printf("%s WINS!\n\nAfter the sacrificing to the great Cthulhu comes the good feeling!", player_two_name);
             if (game_mode == 1) {
                 statistics_p1[0]++;
                 statistics_p1[2]++;
@@ -451,7 +450,7 @@ int main() {
                 statistics_p2[1]++;
             }
         }else {
-            printf("IT'S A DRAW!\n");
+            printf("THERE IS NO WINNER!\n\nThe mind is nothing more than an involuntary ejaculation of the unavoidable entropy of infinite space.");
             if (game_mode == 1) {
                 statistics_p1[0]++;
                 statistics_p1[3]++;
