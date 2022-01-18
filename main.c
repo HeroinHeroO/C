@@ -13,6 +13,32 @@ char player_two = 'O';
 char player_two_name[21] = "COMPUTER";
 int game_mode = 0;
 
+void print_player_stats() {
+    if (game_mode == 3) {
+        return;
+    } else if (game_mode == 2) {
+        printf("\n\nPLAYER STATISTICS:\n\n");
+        printf("LIFETIME GAMES PLAYED: %d - PATHETIC!\n", statistics_p1[0]);
+        printf("TOTAL WINS: %d - WEAK!\n", statistics_p1[1]);
+        printf("GAMES LOST: %d - SOUL CRUSHING!\n", statistics_p1[2]);
+        printf("TIE GAMES: %d - EMBARRASSING!\n", statistics_p1[3]);
+        printf("You have picked the X %d times and the O %d times - BAD CHOICE!\n", statistics_p1[4],statistics_p1[5]);
+        printf("You have marked the BATTLEFIELD OF BLOOD %d times! - BLOOD FOR THE BLOOD GOD!\n", statistics_p1[6]);
+    } else if (game_mode == 1) {
+        printf("\n\nPLAYER STATISTICS:\n\n");
+        printf("LIFETIME GAMES PLAYED: %s: %d - %s: %d - PATHETIC!\n", player_one_name, statistics_p1[0], player_two_name, statistics_p2[0]);
+        printf("TOTAL WINS: %s: %d - %s: %d: - WEAK!\n", player_one_name, statistics_p1[1], player_two_name, statistics_p2[1]);
+        printf("GAMES LOST: %s: %d - %s: %d - SOUL CRUSHING!\n", player_one_name, statistics_p1[2], player_two_name, statistics_p2[2]);
+        printf("TIE GAMES: %s: %d - %s: %d - EMBARRASSING!\n", player_one_name, statistics_p1[3], player_two_name, statistics_p2[3]);
+        printf("%s has picked the X %d times and the O %d times - BAD CHOICE!\n", player_one_name, statistics_p1[4],statistics_p1[5]);
+        printf("%s chose X %d times placed the O %d times - ROOKIE MISTAKE!\n", player_two_name, statistics_p2[4],statistics_p2[5]);
+        printf("%s has marked the BATTLEFIELD OF BLOOD %d times!\n", player_one_name, statistics_p1[6]);
+        printf("%s scorched their sign into SACRED GROUND %d times!\n", player_two_name, statistics_p2[6]);
+        printf("\n\n THE BATTLE IS OVER! You may flee now - or return IF YOU DARE!!!\n\n");
+    }
+    return;
+}
+
 void player1_stats_load() {
     char player_one_file[25];
     strcpy(player_one_file, player_one_name);
@@ -126,7 +152,7 @@ void playeroptions() {
     }
 
     int tmpmode;
-    printf("\nChoose a game mode!\n1: Human versus Human\n2: Human versus Machine\n3: BATTLE OF THE MACHINES!\nPress 4 to flee!\n");
+    printf("\nChoose a game mode!\n1: Human versus Human\n2: Human versus Machine\n3: BATTLE OF THE MACHINES!\nPress 4 to flee now!\n");
     tmpmode = getchar();
     getchar();
     tmpmode = tmpmode -48; // 1-9 on ASCII TABLE
@@ -143,7 +169,7 @@ void playeroptions() {
         case 4:
             exit(EXIT_SUCCESS);
         default:
-            printf("Invalid choice! You will be forced to watch a battle of the machines!\n");
+            printf("Invalid choice! You will be forced to watch a BATTLE OF THE MACHINES!\n");
             game_mode = 3;
             break;
     }
@@ -164,7 +190,7 @@ void playeroptions() {
             statistics_p1[5]++;
             statistics_p2[4]++;
         } else {
-            printf("Invalid Sign! Please choose X or O!\n");
+            printf("Invalid Sign! Choose X or O, FOOL!\n");
             goto sign;
         }
     }
@@ -239,7 +265,7 @@ void player_1_turn() {
 
     do {
         if (game_mode != 3) {
-            printf("Player 1: Enter row# and column# (1-3):");
+            printf("Player 1: Enter row# and column# seperated by SPACE (1-3):");
             scanf("%d %d", &x, &y);
             x--, y--;
             //printf("%d - %d", x, y);
@@ -321,10 +347,9 @@ void player_2_turn() {
     int x, y;
         do {
             if (game_mode == 1) {
-                printf("Player 2: Enter row# and column# (1-3):");
+                printf("Player 2: Enter row# and column# seperated by SPACE (1-3):");
                 scanf("%d %d", &x, &y);
                 x--, y--;
-                //printf("%d - %d", x, y);
 
                 if (board[x][y] != ' ') {
                     printf("This field has already been used!\n");
@@ -358,8 +383,7 @@ void player_2_turn() {
                         }
                     }
                 }
-                for (int k = 0;
-                     k < 3; k++) {                           //checks diagonals - relevant for positions 0/2/4/6/8
+                for (int k = 0; k < 3; k++) {                           //checks diagonals - relevant for positions 0/2/4/6/8
                     if (board[k][k] == player_two) {
                         computer_count[6]++;
                     }
@@ -459,8 +483,26 @@ int main() {
             }
         }
     }
-
-        player_stats_save();
-
+    print_player_stats();
+    player_stats_save();
     return 0;
 }
+/* To do:
+ * Falsche Felder bei user Input abfangen: do while while (y < 0 || y > 2 || x < 0 || x > 2); funktioniert nicht??
+ * freespace funktion: return 1 wenn full, return 0 wenn nicht???
+ * Create function sourcefile and header*/
+
+/*Check strlen of ech array! If full repeat Algorithm!
+ * struct bla
+ * Char Array1[max length of 5 fields]; <- Board[0][0]
+ * Char Array2[max length of 5 fields]; <- Zierzeile
+ * Char Array3[max length of 5 fields]; <- Board[1][1]
+ * Char Array4[max length of 5 fields]; <- Zierzeile
+ * Char Array5[max length of 5 fields]; <- Board[2][2]
+ * Char ArrayPlayer1[Max length of char name[] * 5];
+ * Char ArrayPlayer2[Max length of char name[] * 5];
+ *
+ * Fscanf in jedes der Arrays. dann mit strlen checken ob sie voll sind.
+ * Wenn nein: strcat aktuelles Feld -> fseek zu file Anfang -> fprintf.
+ * Wenn ja: vom gleichen FB (Zeiger ist jetzt am Ende der letzten Zeile von 5 Feldern) aus die Funktion wiederholen
+ * (also arrays neu ausfüllen und wieder checken ob sie voll sind) */
