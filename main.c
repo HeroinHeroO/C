@@ -149,71 +149,107 @@ void player_stats_save() {
         }
     }
 }
+
 void save_board() {
 
     //load or create logfile
-    struct logfile *saves = malloc(sizeof(struct logfile));
+    struct logfile *saves = calloc(1, sizeof(struct logfile));
 
     FILE* fptr3;
     char gamelog[12] = "logfile.txt";
 
-    if ((fptr3 = fopen(gamelog, "w+")) == NULL) {
-        fprintf(stderr, "ERROR: Cannot open logfile!\n");
-        return;
-    }
+
 
     //fill player names with whitespace to match board length
-    int endp1 = strlen(player_one_name) -1;
-    for (int i = 1; i <= (15 - endp1); i++) {
-        player_one_name[endp1 + i] = ' ';
+   int endp1 = strlen(player_one_name) -1;
+    for (int i = 1; i <= (14 - endp1); i++) {
+        player_one_name[endp1 + i] = '.';
     }
 
-    int endp2 = strlen(player_one_name) -1;
-    for (int i = 1; i <= (15 - endp2); i++) {
-        player_two_name[endp2 + i] = ' ';
+    int endp2 = strlen(player_two_name) -1;
+    for (int i = 1; i <= (14 - endp2); i++) {
+        player_two_name[endp2 + i] = '.';
     }
 
-            // scan file for prev. boards and save into struct. Overwrite Arrays if 5 Boards are printed next to each other
-    do {
-        fgets(saves->array1, 75, fptr3);
-        fgets(saves->array2, 75, fptr3);
-        fgets(saves->array4, 75, fptr3);
-        fgets(saves->array3, 75, fptr3);
-        fgets(saves->array5, 75, fptr3);
-        fgets(saves->array6, 75, fptr3);
-        fgets(saves->array7, 75, fptr3);
-    } while (strlen(saves->array1) == 75);       //CHECK 75
+    if ((fptr3 = fopen(gamelog, "r")) != NULL) {
 
-            //add current board to each array
-    char boardline1[16];
-    char boardline2[16];
-    char boardline3[16];
+        // scan file for prev. boards and save into struct. Overwrite Arrays if 5 Boards are printed next to each other
+        //scan_for_board:
+        if(strlen(saves->array1) < 75) {
+            fgets(saves->array1, 76, fptr3);
+            saves->array1[strlen(saves->array1) - 1] = '\0';
+            fgets(saves->array2, 76, fptr3);
+            saves->array2[strlen(saves->array2) - 1] = '\0';
+            fgets(saves->array3, 76, fptr3);
+            saves->array3[strlen(saves->array3) - 1] = '\0';
+            fgets(saves->array4, 76, fptr3);
+            saves->array4[strlen(saves->array4) - 1] = '\0';
+            fgets(saves->array5, 76, fptr3);
+            saves->array5[strlen(saves->array5) - 1] = '\0';
+            fgets(saves->array6, 76, fptr3);
+            saves->array6[strlen(saves->array6) - 1] = '\0';
+            fgets(saves->array7, 76, fptr3);
+            saves->array7[strlen(saves->array7) - 1] = '\0';
+            int leng = strlen(saves->array1);
+            printf("\n\nSTRLEN: %d", leng);
+            if (strlen(saves->array1) >= 74) {
+                memset(saves->array1, 0, strlen(saves->array1));
+                memset(saves->array2, 0, strlen(saves->array2));
+                memset(saves->array3, 0, strlen(saves->array3));
+                memset(saves->array4, 0, strlen(saves->array4));
+                memset(saves->array5, 0, strlen(saves->array5));
+                memset(saves->array6, 0, strlen(saves->array6));
+                memset(saves->array7, 0, strlen(saves->array7));
+                //goto scan_for_board;
+            }
+        }
 
-    sprintf(boardline1, "| %c || %c || %c |", board[0][0], board[0][1], board[0][2]);
-    sprintf(boardline2, "| %c || %c || %c |", board[1][0], board[1][1], board[1][2]);
-    sprintf(boardline3, "| %c || %c || %c |", board[2][0], board[2][1], board[2][2]);
-    /*boardline1[2] = board[0][0];
-    boardline1[7] = board[0][1];
-    boardline1[12] = board[0][2];
+        if (fflush(fptr3) != 0) {
+            fprintf(stderr, "ERROR: Flushing logfile buffer failed!\n");
+            return;
+        }
+        if (fclose(fptr3) != 0) {
+            fprintf(stderr, "ERROR: Closing logfile was unsuccessful!\n");
+            return;
+        }
+    }
+   //add current board to each array
 
-    boardline2[2] = board[1][0];
-    boardline2[7] = board[1][1];
-    boardline2[12] = board[1][2];
+   char boardline1[16];
+   char boardline2[16];
+   char boardline3[16];
 
-    boardline3[2] = board[2][0];
-    boardline3[7] = board[2][1];
-    boardline3[12] = board[2][2];*/
+   sprintf(boardline1, "| %c || %c || %c |", board[0][0], board[0][1], board[0][2]);
+   sprintf(boardline2, "| %c || %c || %c |", board[1][0], board[1][1], board[1][2]);
+   sprintf(boardline3, "| %c || %c || %c |", board[2][0], board[2][1], board[2][2]);
 
-    strcat(saves->array1, boardline1);
-    strcat(saves->array2, "|---||---||---|");
-    strcat(saves->array3, boardline2);
-    strcat(saves->array4, "|---||---||---|");
-    strcat(saves->array5, boardline3);
-    strcat(saves->array6, player_one_name);
-    strcat(saves->array7, player_two_name);
+   strcat(saves->array1, boardline1);
+   strcat(saves->array2, "|---||---||---|");
+   strcat(saves->array3, boardline2);
+   strcat(saves->array4, "|---||---||---|");
+   strcat(saves->array5, boardline3);
+   strcat(saves->array6, player_one_name);
+   strcat(saves->array7, player_two_name);
 
+    //create logfile if it doesn't exist
+    if ((fptr3 = fopen(gamelog, "w")) == NULL) {
+        fprintf(stderr, "ERROR: Opening logfile failed!\n");
+        return;
+    }
+    if (fflush(fptr3) != 0) {
+        fprintf(stderr, "ERROR: Flushing logfile buffer failed!\n");
+        return;
+    }
+    if (fclose(fptr3) != 0) {
+        fprintf(stderr, "ERROR: Closing logfile was unsuccessful!\n");
+        return;
+    }
     //print arrays into logfile
-    fseek(fptr3, 0, SEEK_SET);
+
+    if ((fptr3 = fopen(gamelog, "a")) == NULL) {
+        fprintf(stderr, "ERROR: Opening logfile failed!\n");
+        return;
+    }
     fprintf(fptr3, "%s\n", saves->array1);
     fprintf(fptr3, "%s\n", saves->array2);
     fprintf(fptr3, "%s\n", saves->array3);
@@ -238,7 +274,7 @@ void playeroptions() {
     char player_one_sign;
 
     printf("Player One - Enter your name (max. 14 characters):");
-    fgets(player_one_name, 20, stdin);
+    fgets(player_one_name, 14, stdin);
     player_one_name[strlen(player_one_name) - 1] = '\0';
 
     if (game_mode != 3) {
@@ -290,14 +326,13 @@ void playeroptions() {
     }
     if (game_mode == 1) {
         printf("Player Two - Enter your name (max. 14 characters):");
-        fgets(player_two_name, 20, stdin);
+        fgets(player_two_name, 14, stdin);
         player_two_name[strlen(player_two_name) - 1] = '\0';
 
         player2_stats_load();
     }
     printf("\n");
 }
-
 
 char who_wins() {
     for (int i = 0; i < 3; i++) { //checks rows for matching signs
@@ -433,7 +468,7 @@ void player_1_turn() {
             }
             y = lastbest % 3;
             x = lastbest / 3;
-            sleep(1);
+            //sleep(1);
             board[x][y] = player_one;
             break;
         }
@@ -517,7 +552,7 @@ void player_2_turn() {
                 }
                 y = lastbest % 3;
                 x = lastbest / 3;
-                sleep(1);
+                //sleep(1);
                 board[x][y] = player_two;
                 break;
             }
@@ -525,13 +560,12 @@ void player_2_turn() {
 }
 
 
-int main() {
+int main(void) {
 
     srand(time(NULL));
     char winner = ' ';
     int starting_player = (rand() % 2);
 
-    winner = ' ';
     fillFreeSpace();
     playeroptions();
 
@@ -584,33 +618,15 @@ int main() {
             }
         }
     }
-    //print_player_stats();
-    //player_stats_save();
+    print_player_stats();
+    player_stats_save();
     save_board();
     return 0;
 }
-/* To do:
- * freespace funktion: return 1 wenn full, return 0 wenn nicht???
- * Create function sourcefile and header*/
 
-/*Check strlen of ech array! If full repeat Algorithm!
- * struct bla
- * Char Array1[max length of 5 fields]; <- Board[0][0]
- * Char Array2[max length of 5 fields]; <- Zierzeile
- * Char Array3[max length of 5 fields]; <- Board[1][1]
- * Char Array4[max length of 5 fields]; <- Zierzeile
- * Char Array5[max length of 5 fields]; <- Board[2][2]
- * Char ArrayPlayer1[Max length of char name[] * 5];
- * Char ArrayPlayer2[Max length of char name[] * 5];
- *
- * Fscanf in jedes der Arrays. dann mit strlen checken ob sie voll sind.
- * Wenn nein: strcat aktuelles Feld -> fseek zu file Anfang -> fprintf.
- * Wenn ja: vom gleichen FB (Zeiger ist jetzt am Ende der letzten Zeile von 5 Feldern) aus die Funktion wiederholen
- * (also arrays neu ausfüllen und wieder checken ob sie voll sind)
- *
-
-
- *
- *
- *
- * */
+/* put players in structs
+ struct player {
+ char sign;
+ char name[15];
+ int statistics[7]
+ }*/
