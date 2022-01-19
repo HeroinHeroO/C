@@ -7,11 +7,21 @@
 char board[3][3];
 int statistics_p1[7] = {0, 0, 0, 0, 0, 0, 0}; // Games played, wins, losses, ties, X games, O games, signs placed
 char player_one = 'X';
-char player_one_name[21];
+char player_one_name[15];
 int statistics_p2[7] = {0, 0, 0, 0, 0, 0, 0}; // Games played, wins, losses, ties, X games, O games, signs placed
 char player_two = 'O';
-char player_two_name[21] = "COMPUTER";
+char player_two_name[15] = "COMPUTER";
 int game_mode = 0;
+
+struct logfile {
+    char array1[76];
+    char array2[76];
+    char array3[76];
+    char array4[76];
+    char array5[76];
+    char array6[76];
+    char array7[76];
+};
 
 void print_player_stats() {
     if (game_mode == 3) {
@@ -21,7 +31,7 @@ void print_player_stats() {
         printf("LIFETIME GAMES PLAYED: %d - PATHETIC!\n", statistics_p1[0]);
         printf("TOTAL WINS: %d - WEAK!\n", statistics_p1[1]);
         printf("GAMES LOST: %d - SOUL CRUSHING!\n", statistics_p1[2]);
-        printf("TIE GAMES: %d - EMBARRASSING!\n", statistics_p1[3]);
+        printf("TIE GAMES: %d - PITIFUL!\n", statistics_p1[3]);
         printf("You have picked the X %d times and the O %d times - BAD CHOICE!\n", statistics_p1[4],statistics_p1[5]);
         printf("You have marked the BATTLEFIELD OF BLOOD %d times! - BLOOD FOR THE BLOOD GOD!\n", statistics_p1[6]);
     } else if (game_mode == 1) {
@@ -29,7 +39,7 @@ void print_player_stats() {
         printf("LIFETIME GAMES PLAYED: %s: %d - %s: %d - PATHETIC!\n", player_one_name, statistics_p1[0], player_two_name, statistics_p2[0]);
         printf("TOTAL WINS: %s: %d - %s: %d: - WEAK!\n", player_one_name, statistics_p1[1], player_two_name, statistics_p2[1]);
         printf("GAMES LOST: %s: %d - %s: %d - SOUL CRUSHING!\n", player_one_name, statistics_p1[2], player_two_name, statistics_p2[2]);
-        printf("TIE GAMES: %s: %d - %s: %d - EMBARRASSING!\n", player_one_name, statistics_p1[3], player_two_name, statistics_p2[3]);
+        printf("TIE GAMES: %s: %d - %s: %d - PITIFUL!\n", player_one_name, statistics_p1[3], player_two_name, statistics_p2[3]);
         printf("%s has picked the X %d times and the O %d times - BAD CHOICE!\n", player_one_name, statistics_p1[4],statistics_p1[5]);
         printf("%s chose X %d times placed the O %d times - ROOKIE MISTAKE!\n", player_two_name, statistics_p2[4],statistics_p2[5]);
         printf("%s has marked the BATTLEFIELD OF BLOOD %d times!\n", player_one_name, statistics_p1[6]);
@@ -47,7 +57,7 @@ void player1_stats_load() {
     FILE *fptr;
     int num;
     if ((fptr = fopen(player_one_file, "r")) == NULL) {
-        printf("You seem to be new here, %s, good luck!\n", player_one_name);
+        printf("You seem to be new here, %s, good luck - you WILL need it!\n", player_one_name);
     } else {
         for (int i = 0; i < 7; i++) {
             fscanf(fptr, "%d", &num);
@@ -72,7 +82,7 @@ void player2_stats_load() {
     FILE* fptr2;
     int num;
     if ((fptr2 = fopen(player_two_file, "r")) == NULL) {
-        printf("You seem to be new here, %s, good luck!\n", player_two_name);
+        printf("You seem to be new here, %s, good luck - you WILL need it!\n", player_two_name);
     }else {
         for (int i = 0; i < 7; i++) {
             fscanf(fptr2, "%d", &num);
@@ -139,11 +149,95 @@ void player_stats_save() {
         }
     }
 }
+void save_board() {
+
+    //load or create logfile
+    struct logfile *saves = malloc(sizeof(struct logfile));
+
+    FILE* fptr3;
+    char gamelog[12] = "logfile.txt";
+
+    if ((fptr3 = fopen(gamelog, "w+")) == NULL) {
+        fprintf(stderr, "ERROR: Cannot open logfile!\n");
+        return;
+    }
+
+    //fill player names with whitespace to match board length
+    int endp1 = strlen(player_one_name) -1;
+    for (int i = 1; i <= (15 - endp1); i++) {
+        player_one_name[endp1 + i] = ' ';
+    }
+
+    int endp2 = strlen(player_one_name) -1;
+    for (int i = 1; i <= (15 - endp2); i++) {
+        player_two_name[endp2 + i] = ' ';
+    }
+
+            // scan file for prev. boards and save into struct. Overwrite Arrays if 5 Boards are printed next to each other
+    do {
+        fgets(saves->array1, 75, fptr3);
+        fgets(saves->array2, 75, fptr3);
+        fgets(saves->array4, 75, fptr3);
+        fgets(saves->array3, 75, fptr3);
+        fgets(saves->array5, 75, fptr3);
+        fgets(saves->array6, 75, fptr3);
+        fgets(saves->array7, 75, fptr3);
+    } while (strlen(saves->array1) == 75);       //CHECK 75
+
+            //add current board to each array
+    char boardline1[16];
+    char boardline2[16];
+    char boardline3[16];
+
+    sprintf(boardline1, "| %c || %c || %c |", board[0][0], board[0][1], board[0][2]);
+    sprintf(boardline2, "| %c || %c || %c |", board[1][0], board[1][1], board[1][2]);
+    sprintf(boardline3, "| %c || %c || %c |", board[2][0], board[2][1], board[2][2]);
+    /*boardline1[2] = board[0][0];
+    boardline1[7] = board[0][1];
+    boardline1[12] = board[0][2];
+
+    boardline2[2] = board[1][0];
+    boardline2[7] = board[1][1];
+    boardline2[12] = board[1][2];
+
+    boardline3[2] = board[2][0];
+    boardline3[7] = board[2][1];
+    boardline3[12] = board[2][2];*/
+
+    strcat(saves->array1, boardline1);
+    strcat(saves->array2, "|---||---||---|");
+    strcat(saves->array3, boardline2);
+    strcat(saves->array4, "|---||---||---|");
+    strcat(saves->array5, boardline3);
+    strcat(saves->array6, player_one_name);
+    strcat(saves->array7, player_two_name);
+
+    //print arrays into logfile
+    fseek(fptr3, 0, SEEK_SET);
+    fprintf(fptr3, "%s\n", saves->array1);
+    fprintf(fptr3, "%s\n", saves->array2);
+    fprintf(fptr3, "%s\n", saves->array3);
+    fprintf(fptr3, "%s\n", saves->array4);
+    fprintf(fptr3, "%s\n", saves->array5);
+    fprintf(fptr3, "%s\n", saves->array6);
+    fprintf(fptr3, "%s\n", saves->array7);
+
+    if (fflush(fptr3) != 0) {
+        fprintf(stderr, "ERROR: Flushing logfile buffer failed!\n");
+        return;
+    }
+    if (fclose(fptr3) != 0) {
+        fprintf(stderr, "ERROR: Closing logfile was unsuccessful!\n");
+        return;
+    }
+    free(saves);
+    return;
+}
 
 void playeroptions() {
     char player_one_sign;
 
-    printf("Player One - Enter your name (max. 20 characters):");
+    printf("Player One - Enter your name (max. 14 characters):");
     fgets(player_one_name, 20, stdin);
     player_one_name[strlen(player_one_name) - 1] = '\0';
 
@@ -195,7 +289,7 @@ void playeroptions() {
         }
     }
     if (game_mode == 1) {
-        printf("Player Two - Enter your name (max. 20 characters):");
+        printf("Player Two - Enter your name (max. 14 characters):");
         fgets(player_two_name, 20, stdin);
         player_two_name[strlen(player_two_name) - 1] = '\0';
 
@@ -261,17 +355,20 @@ int freeSpace() {       // return 1 if full, return 0 if not
 }
 
 void player_1_turn() {
-    int x, y;
+    int x = 0, y = 0;
 
     do {
         if (game_mode != 3) {
             printf("Player 1: Enter row# and column# seperated by SPACE (1-3):");
             scanf("%d %d", &x, &y);
             x--, y--;
-            //printf("%d - %d", x, y);
 
             if (board[x][y] != ' ') {
-                printf("This field has already been used!\n");
+                if (x < 0 || x > 2 || y < 0 || y > 2) {
+                    printf("YOUR CHOICE IS BAD AND YOU SHOULD FEEL BAD!\n");
+                } else {
+                    printf("TOO SLOW! This field has already been used!\n");
+                }
             } else {
                 board[x][y] = player_one;
                 statistics_p1[6]++;
@@ -352,7 +449,11 @@ void player_2_turn() {
                 x--, y--;
 
                 if (board[x][y] != ' ') {
-                    printf("This field has already been used!\n");
+                    if (x < 0 || x > 2 || y < 0 || y > 2) {
+                        printf("YOUR CHOICE IS BAD AND YOU SHOULD FEEL BAD!\n");
+                    } else {
+                        printf("TOO SLOW! This field has already been used!\n");
+                    }
                 } else {
                     board[x][y] = player_two;
                     statistics_p2[6]++;
@@ -456,7 +557,7 @@ int main() {
         if(winner == player_one){
             if (game_mode == 3) {
                 printf("The MACHINE wins!\n\nThe mind is nothing more than an involuntary ejaculation of the unavoidable entropy of infinite space.");
-            }else {
+            } else {
                 printf("%s WINS!\n\nAfter the sacrificing to the great Cthulhu comes the good feeling!", player_one_name);
                 statistics_p1[0]++;
                 statistics_p1[1]++;
@@ -465,7 +566,7 @@ int main() {
                     statistics_p2[2]++;
                 }
             }
-        }else if(winner == player_two) {
+        } else if(winner == player_two) {
             printf("%s WINS!\n\nAfter the sacrificing to the great Cthulhu comes the good feeling!", player_two_name);
             if (game_mode == 1) {
                 statistics_p1[0]++;
@@ -473,7 +574,7 @@ int main() {
                 statistics_p2[0]++;
                 statistics_p2[1]++;
             }
-        }else {
+        } else {
             printf("THERE IS NO WINNER!\n\nThe mind is nothing more than an involuntary ejaculation of the unavoidable entropy of infinite space.");
             if (game_mode == 1) {
                 statistics_p1[0]++;
@@ -483,12 +584,12 @@ int main() {
             }
         }
     }
-    print_player_stats();
-    player_stats_save();
+    //print_player_stats();
+    //player_stats_save();
+    save_board();
     return 0;
 }
 /* To do:
- * Falsche Felder bei user Input abfangen: do while while (y < 0 || y > 2 || x < 0 || x > 2); funktioniert nicht??
  * freespace funktion: return 1 wenn full, return 0 wenn nicht???
  * Create function sourcefile and header*/
 
@@ -505,4 +606,11 @@ int main() {
  * Fscanf in jedes der Arrays. dann mit strlen checken ob sie voll sind.
  * Wenn nein: strcat aktuelles Feld -> fseek zu file Anfang -> fprintf.
  * Wenn ja: vom gleichen FB (Zeiger ist jetzt am Ende der letzten Zeile von 5 Feldern) aus die Funktion wiederholen
- * (also arrays neu ausfüllen und wieder checken ob sie voll sind) */
+ * (also arrays neu ausfüllen und wieder checken ob sie voll sind)
+ *
+
+
+ *
+ *
+ *
+ * */
