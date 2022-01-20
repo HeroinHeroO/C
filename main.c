@@ -5,13 +5,13 @@
 //#include <windows.h>
 
 char board[3][3];
-int statistics_p1[7] = {0, 0, 0, 0, 0, 0, 0}; // Games played, wins, losses, ties, X games, O games, signs placed
-char player_one = 'X';
-char player_one_name[15];
-int statistics_p2[7] = {0, 0, 0, 0, 0, 0, 0}; // Games played, wins, losses, ties, X games, O games, signs placed
-char player_two = 'O';
-char player_two_name[15] = "COMPUTER";
-int game_mode = 0;
+//int statistics_p1[7] = {0, 0, 0, 0, 0, 0, 0}; // Games played, wins, losses, ties, X games, O games, signs placed
+//char player_one = 'X';
+//char player_one_name[15];
+//int statistics_p2[7] = {0, 0, 0, 0, 0, 0, 0}; // Games played, wins, losses, ties, X games, O games, signs placed
+//char player_two = 'O';
+//char two.name[15] = "COMPUTER";
+int game_mode = 0; // 1 = Player v Player, 2 = Player vs PC, 3 = PC v PC.
 
 struct logfile {
     char array1[76];
@@ -23,27 +23,38 @@ struct logfile {
     char array7[76];
 };
 
+struct player {
+    char sign;
+    char name[15];
+    int statistics[7];
+};
+
+
+struct player one = {'X', "Human", 0, 0, 0, 0, 0, 0, 0};
+struct player two = {'O', "MACHINE", 0, 0, 0, 0, 0, 0, 0};
+
+
 void print_player_stats() {
     if (game_mode == 3) {
         return;
     } else if (game_mode == 2) {
         printf("\n\nPLAYER STATISTICS:\n\n");
-        printf("LIFETIME GAMES PLAYED: %d - PATHETIC!\n", statistics_p1[0]);
-        printf("TOTAL WINS: %d - WEAK!\n", statistics_p1[1]);
-        printf("GAMES LOST: %d - SOUL CRUSHING!\n", statistics_p1[2]);
-        printf("TIE GAMES: %d - PITIFUL!\n", statistics_p1[3]);
-        printf("You have picked the X %d times and the O %d times - BAD CHOICE!\n", statistics_p1[4],statistics_p1[5]);
-        printf("You have marked the BATTLEFIELD OF BLOOD %d times! - BLOOD FOR THE BLOOD GOD!\n", statistics_p1[6]);
+        printf("LIFETIME GAMES PLAYED: %d - PATHETIC!\n", one.statistics[0]);
+        printf("TOTAL WINS: %d - WEAK!\n", one.statistics[1]);
+        printf("GAMES LOST: %d - SOUL CRUSHING!\n", one.statistics[2]);
+        printf("TIE GAMES: %d - PITIFUL!\n", one.statistics[3]);
+        printf("You have picked the X %d times and the O %d times - BAD CHOICE!\n", one.statistics[4],one.statistics[5]);
+        printf("You have marked the BATTLEFIELD OF BLOOD %d times! - BLOOD FOR THE BLOOD GOD!\n", one.statistics[6]);
     } else if (game_mode == 1) {
         printf("\n\nPLAYER STATISTICS:\n\n");
-        printf("LIFETIME GAMES PLAYED: %s: %d - %s: %d - PATHETIC!\n", player_one_name, statistics_p1[0], player_two_name, statistics_p2[0]);
-        printf("TOTAL WINS: %s: %d - %s: %d: - WEAK!\n", player_one_name, statistics_p1[1], player_two_name, statistics_p2[1]);
-        printf("GAMES LOST: %s: %d - %s: %d - SOUL CRUSHING!\n", player_one_name, statistics_p1[2], player_two_name, statistics_p2[2]);
-        printf("TIE GAMES: %s: %d - %s: %d - PITIFUL!\n", player_one_name, statistics_p1[3], player_two_name, statistics_p2[3]);
-        printf("%s has picked the X %d times and the O %d times - BAD CHOICE!\n", player_one_name, statistics_p1[4],statistics_p1[5]);
-        printf("%s chose X %d times placed the O %d times - ROOKIE MISTAKE!\n", player_two_name, statistics_p2[4],statistics_p2[5]);
-        printf("%s has marked the BATTLEFIELD OF BLOOD %d times!\n", player_one_name, statistics_p1[6]);
-        printf("%s scorched their sign into SACRED GROUND %d times!\n", player_two_name, statistics_p2[6]);
+        printf("LIFETIME GAMES PLAYED: %s: %d - %s: %d - PATHETIC!\n", one.name, one.statistics[0], two.name, two.statistics[0]);
+        printf("TOTAL WINS: %s: %d - %s: %d: - WEAK!\n", one.name, one.statistics[1], two.name, two.statistics[1]);
+        printf("GAMES LOST: %s: %d - %s: %d - SOUL CRUSHING!\n", one.name, one.statistics[2], two.name, two.statistics[2]);
+        printf("TIE GAMES: %s: %d - %s: %d - PITIFUL!\n", one.name, one.statistics[3], two.name, two.statistics[3]);
+        printf("%s has picked the X %d times and the O %d times - BAD CHOICE!\n", one.name, one.statistics[4],one.statistics[5]);
+        printf("%s chose X %d times placed the O %d times - ROOKIE MISTAKE!\n", two.name, two.statistics[4],two.statistics[5]);
+        printf("%s has marked the BATTLEFIELD OF BLOOD %d times!\n", one.name, one.statistics[6]);
+        printf("%s scorched their sign into SACRED GROUND %d times!\n", two.name, two.statistics[6]);
         printf("\n\n THE BATTLE IS OVER! You may flee now - or return IF YOU DARE!!!\n\n");
     }
     return;
@@ -51,24 +62,24 @@ void print_player_stats() {
 
 void player1_stats_load() {
     char player_one_file[25];
-    strcpy(player_one_file, player_one_name);
+    strcpy(player_one_file, one.name);
     strcat(player_one_file, ".txt");
 
     FILE *fptr;
     int num;
     if ((fptr = fopen(player_one_file, "r")) == NULL) {
-        printf("You seem to be new here, %s, good luck - you WILL need it!\n", player_one_name);
+        printf("You seem to be new here, %s, good luck - you WILL need it!\n", one.name);
     } else {
         for (int i = 0; i < 7; i++) {
             fscanf(fptr, "%d", &num);
-            statistics_p1[i] = num;
+            one.statistics[i] = num;
         }
         if (fflush(fptr) != 0) {
-            fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", player_one_name);
+            fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", one.name);
             return;
         }
         if (fclose(fptr) != 0) {
-            fprintf(stderr, "ERROR: Closing statistics file for %s was unsuccessful!\n", player_one_name);
+            fprintf(stderr, "ERROR: Closing statistics file for %s was unsuccessful!\n", one.name);
             return;
         }
     }
@@ -76,24 +87,24 @@ void player1_stats_load() {
 
 void player2_stats_load() {
     char player_two_file[25];
-    strcpy(player_two_file, player_two_name);
+    strcpy(player_two_file, two.name);
     strcat(player_two_file, ".txt");
 
     FILE* fptr2;
     int num;
     if ((fptr2 = fopen(player_two_file, "r")) == NULL) {
-        printf("You seem to be new here, %s, good luck - you WILL need it!\n", player_two_name);
+        printf("You seem to be new here, %s, good luck - you WILL need it!\n", two.name);
     }else {
         for (int i = 0; i < 7; i++) {
             fscanf(fptr2, "%d", &num);
-            statistics_p2[i] = num;
+            two.statistics[i] = num;
         }
         if (fflush(fptr2) != 0) {
-            fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", player_two_name);
+            fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", two.name);
             return;
         }
         if (fclose(fptr2) != 0) {
-            fprintf(stderr, "ERROR: Closing statistics file for %s was unsuccessful!\n", player_one_name);
+            fprintf(stderr, "ERROR: Closing statistics file for %s was unsuccessful!\n", one.name);
             return;
         }
     }
@@ -101,50 +112,50 @@ void player2_stats_load() {
 
 void player_stats_save() {
     char player_one_file[25];
-    strcpy(player_one_file, player_one_name);
+    strcpy(player_one_file, one.name);
     strcat(player_one_file, ".txt");
 
     FILE* fptr;
     if ((fptr = fopen(player_one_file, "w")) == NULL) {
-        fprintf(stderr, "ERROR: Cannot open statistics file for %s!\n", player_one_name);
+        fprintf(stderr, "ERROR: Cannot open statistics file for %s!\n", one.name);
         return;
     }
     for (int i = 0; i < 7; i++) {
-        fprintf(fptr, "%d ", statistics_p1[i]);
+        fprintf(fptr, "%d ", one.statistics[i]);
     }
     if (game_mode != 3){
-        printf("Statistics for %s saved!\n", player_one_name);
+        printf("Statistics for %s saved!\n", one.name);
     }
     if (fflush(fptr) != 0) {
-        fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", player_one_name);
+        fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", one.name);
         return;
     }
     if (fclose(fptr) != 0) {
-        fprintf(stderr, "ERROR: Closing statistics file for %s was unsuccessful!\n", player_one_name);
+        fprintf(stderr, "ERROR: Closing statistics file for %s was unsuccessful!\n", one.name);
         return;
     }
 
     if (game_mode == 1) {
         FILE *fptr2;
         char player_two_file[25];
-        strcpy(player_two_file, player_two_name);
+        strcpy(player_two_file, two.name);
         strcat(player_two_file, ".txt");
 
         if ((fptr2 = fopen(player_two_file, "w")) == NULL) {
-            fprintf(stderr, "ERROR: Cannot open statistics file for %s!\n", player_two_name);
+            fprintf(stderr, "ERROR: Cannot open statistics file for %s!\n", two.name);
             return;
         }
         for (int i = 0; i < 7; i++) {
-            fprintf(fptr2, "%d ", statistics_p2[i]);
+            fprintf(fptr2, "%d ", two.statistics[i]);
         }
-        printf("Statistics for %s saved!\n", player_two_name);
+        printf("Statistics for %s saved!\n", two.name);
 
         if (fflush(fptr2) != 0) {
-            fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", player_two_name);
+            fprintf(stderr, "ERROR: Flushing statistics file buffer for %s failed!\n", two.name);
             return;
         }
         if (fclose(fptr2) != 0) {
-            fprintf(stderr, "ERROR: Closing statistics file for %d was unsuccessful!\n", player_one_name);
+            fprintf(stderr, "ERROR: Closing statistics file for %d was unsuccessful!\n", one.name);
             return;
         }
     }
@@ -161,20 +172,20 @@ void save_board() {
 
 
     //fill player names with whitespace to match board length
-   int endp1 = strlen(player_one_name) -1;
-    for (int i = 1; i <= (14 - endp1); i++) {
-        player_one_name[endp1 + i] = '.';
+   int p1end = strlen(one.name) -1;
+    for (int i = 1; i <= (14 - p1end); i++) {
+        one.name[p1end + i] = '.';
     }
 
-    int endp2 = strlen(player_two_name) -1;
-    for (int i = 1; i <= (14 - endp2); i++) {
-        player_two_name[endp2 + i] = '.';
+    int p2end = strlen(two.name) -1;
+    for (int i = 1; i <= (14 - p2end); i++) {
+        two.name[p2end + i] = '.';
     }
 
     if ((fptr3 = fopen(gamelog, "r")) != NULL) {
 
-        // scan file for prev. boards and save into struct. Overwrite Arrays if 5 Boards are printed next to each other
-        //scan_for_board:
+        // scan file for prev. boards and save into struct. Overwrite File if 5 Boards are printed next to each other
+
         if(strlen(saves->array1) < 75) {
             fgets(saves->array1, 76, fptr3);
             saves->array1[strlen(saves->array1) - 1] = '\0';
@@ -190,8 +201,7 @@ void save_board() {
             saves->array6[strlen(saves->array6) - 1] = '\0';
             fgets(saves->array7, 76, fptr3);
             saves->array7[strlen(saves->array7) - 1] = '\0';
-            int leng = strlen(saves->array1);
-            printf("\n\nSTRLEN: %d", leng);
+
             if (strlen(saves->array1) >= 74) {
                 memset(saves->array1, 0, strlen(saves->array1));
                 memset(saves->array2, 0, strlen(saves->array2));
@@ -200,7 +210,6 @@ void save_board() {
                 memset(saves->array5, 0, strlen(saves->array5));
                 memset(saves->array6, 0, strlen(saves->array6));
                 memset(saves->array7, 0, strlen(saves->array7));
-                //goto scan_for_board;
             }
         }
 
@@ -228,8 +237,8 @@ void save_board() {
    strcat(saves->array3, boardline2);
    strcat(saves->array4, "|---||---||---|");
    strcat(saves->array5, boardline3);
-   strcat(saves->array6, player_one_name);
-   strcat(saves->array7, player_two_name);
+   strcat(saves->array6, one.name);
+   strcat(saves->array7, two.name);
 
     //create logfile if it doesn't exist
     if ((fptr3 = fopen(gamelog, "w")) == NULL) {
@@ -270,12 +279,12 @@ void save_board() {
     return;
 }
 
-void playeroptions() {
+void player_options() {
     char player_one_sign;
 
     printf("Player One - Enter your name (max. 14 characters):");
-    fgets(player_one_name, 14, stdin);
-    player_one_name[strlen(player_one_name) - 1] = '\0';
+    fgets(one.name, 14, stdin);
+    one.name[strlen(one.name) - 1] = '\0';
 
     if (game_mode != 3) {
         player1_stats_load();
@@ -306,19 +315,19 @@ void playeroptions() {
 
     sign:
     if (game_mode != 3) {
-        printf("%s, chose your sign: X or O\n", player_one_name);
+        printf("%s, chose your sign: X or O\n", one.name);
         player_one_sign = getchar();
         getchar();
         if (player_one_sign == 'x' || player_one_sign == 'X') {
-            player_one = 'X';
-            player_two = 'O';
-            statistics_p1[4]++;
-            statistics_p2[5]++;
+            one.sign = 'X';
+            two.sign = 'O';
+            one.statistics[4]++;
+            two.statistics[5]++;
         } else if (player_one_sign == 'o' || player_one_sign == 'O') {
-            player_one = 'O';
-            player_two = 'X';
-            statistics_p1[5]++;
-            statistics_p2[4]++;
+            one.sign = 'O';
+            two.sign = 'X';
+            one.statistics[5]++;
+            two.statistics[4]++;
         } else {
             printf("Invalid Sign! Choose X or O, FOOL!\n");
             goto sign;
@@ -326,8 +335,8 @@ void playeroptions() {
     }
     if (game_mode == 1) {
         printf("Player Two - Enter your name (max. 14 characters):");
-        fgets(player_two_name, 14, stdin);
-        player_two_name[strlen(player_two_name) - 1] = '\0';
+        fgets(two.name, 14, stdin);
+        two.name[strlen(two.name) - 1] = '\0';
 
         player2_stats_load();
     }
@@ -356,7 +365,7 @@ char who_wins() {
     return ' ';
 }
 
-void fillFreeSpace() {
+void fill_free_spaces() {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             board[i][j] = ' ';
@@ -364,7 +373,7 @@ void fillFreeSpace() {
     }
 }
 
-void printBoard() {
+void print_board() {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             printf("| %c |", board[i][j]);
@@ -376,7 +385,7 @@ void printBoard() {
     printf("\n");
 }
 
-int freeSpace() {       // return 1 if full, return 0 if not
+int free_space() {       // return 1 if full, return 0 if not
     int spaces = 0;
 
     for (int i = 0; i < 3; i++) {
@@ -405,8 +414,8 @@ void player_1_turn() {
                     printf("TOO SLOW! This field has already been used!\n");
                 }
             } else {
-                board[x][y] = player_one;
-                statistics_p1[6]++;
+                board[x][y] = one.sign;
+                one.statistics[6]++;
                 break;
             }
         }else {                                         //checks all empty field for number of adjecent (computer) player signs
@@ -426,20 +435,20 @@ void player_1_turn() {
             }
             for (int i = 0; i < 3; i++) {                       // checks rows and columns sum of own player signs
                 for (int j = 0; j < 3; j++) {
-                    if (board[i][j] == player_one) {
+                    if (board[i][j] == one.sign) {
                         computer_count[i]++;
                     }
-                    if (board[j][i] == player_one) {
+                    if (board[j][i] == one.sign) {
                         computer_count[i + 3]++;
                     }
                 }
             }
             for (int k = 0;
                  k < 3; k++) {                           //checks diagonals - relevant for positions 0/2/4/6/8
-                if (board[k][k] == player_one) {
+                if (board[k][k] == one.sign) {
                     computer_count[6]++;
                 }
-                if (board[2 - k][k] == player_one) {
+                if (board[2 - k][k] == one.sign) {
                     computer_count[7]++;
                 }
             }
@@ -469,7 +478,7 @@ void player_1_turn() {
             y = lastbest % 3;
             x = lastbest / 3;
             //sleep(1);
-            board[x][y] = player_one;
+            board[x][y] = one.sign;
             break;
         }
     } while (board[x][y] != ' ');
@@ -490,8 +499,8 @@ void player_2_turn() {
                         printf("TOO SLOW! This field has already been used!\n");
                     }
                 } else {
-                    board[x][y] = player_two;
-                    statistics_p2[6]++;
+                    board[x][y] = two.sign;
+                    two.statistics[6]++;
                     break;
                 }
             } else {                                         //checks all empty field for number of adjecent (computer) player signs
@@ -511,19 +520,19 @@ void player_2_turn() {
                 }
                 for (int i = 0; i < 3; i++) {                       // checks rows and columns sum of own player signs
                     for (int j = 0; j < 3; j++) {
-                        if (board[i][j] == player_two) {
+                        if (board[i][j] == two.sign) {
                             computer_count[i]++;
                         }
-                        if (board[j][i] == player_two) {
+                        if (board[j][i] == two.sign) {
                             computer_count[i + 3]++;
                         }
                     }
                 }
                 for (int k = 0; k < 3; k++) {                           //checks diagonals - relevant for positions 0/2/4/6/8
-                    if (board[k][k] == player_two) {
+                    if (board[k][k] == two.sign) {
                         computer_count[6]++;
                     }
-                    if (board[2 - k][k] == player_two) {
+                    if (board[2 - k][k] == two.sign) {
                         computer_count[7]++;
                     }
                 }
@@ -553,7 +562,7 @@ void player_2_turn() {
                 y = lastbest % 3;
                 x = lastbest / 3;
                 //sleep(1);
-                board[x][y] = player_two;
+                board[x][y] = two.sign;
                 break;
             }
         } while (board[x][y] != ' ');
@@ -566,55 +575,55 @@ int main(void) {
     char winner = ' ';
     int starting_player = (rand() % 2);
 
-    fillFreeSpace();
-    playeroptions();
+    fill_free_spaces();
+    player_options();
 
-    while(winner == ' ' && freeSpace() != 9) {
-        printBoard();
+    while(winner == ' ' && free_space() != 9) {
+        print_board();
         if (starting_player == 0){
             player_1_turn();
         }else {
             player_2_turn();
         }
         winner = who_wins();
-        freeSpace();
+        free_space();
         starting_player++;
         starting_player = (starting_player % 2);
 
-        if (winner != ' ' || freeSpace() == 9) {
+        if (winner != ' ' || free_space() == 9) {
             break;
         }
     }
-    printBoard();
+    print_board();
 
-    if (winner != ' ' || freeSpace() == 9) {
-        if(winner == player_one){
+    if (winner != ' ' || free_space() == 9) {
+        if(winner == one.sign){
             if (game_mode == 3) {
                 printf("The MACHINE wins!\n\nThe mind is nothing more than an involuntary ejaculation of the unavoidable entropy of infinite space.");
             } else {
-                printf("%s WINS!\n\nAfter the sacrificing to the great Cthulhu comes the good feeling!", player_one_name);
-                statistics_p1[0]++;
-                statistics_p1[1]++;
+                printf("%s WINS!\n\nAfter the sacrificing to the great Cthulhu comes the good feeling!", one.name);
+                one.statistics[0]++;
+                one.statistics[1]++;
                 if (game_mode == 1) {
-                    statistics_p2[0]++;
-                    statistics_p2[2]++;
+                    two.statistics[0]++;
+                    two.statistics[2]++;
                 }
             }
-        } else if(winner == player_two) {
-            printf("%s WINS!\n\nAfter the sacrificing to the great Cthulhu comes the good feeling!", player_two_name);
+        } else if(winner == two.sign) {
+            printf("%s WINS!\n\nAfter the sacrificing to the great Cthulhu comes the good feeling!", two.name);
             if (game_mode == 1) {
-                statistics_p1[0]++;
-                statistics_p1[2]++;
-                statistics_p2[0]++;
-                statistics_p2[1]++;
+                one.statistics[0]++;
+                one.statistics[2]++;
+                two.statistics[0]++;
+                two.statistics[1]++;
             }
         } else {
             printf("THERE IS NO WINNER!\n\nThe mind is nothing more than an involuntary ejaculation of the unavoidable entropy of infinite space.");
             if (game_mode == 1) {
-                statistics_p1[0]++;
-                statistics_p1[3]++;
-                statistics_p2[0]++;
-                statistics_p2[3]++;
+                one.statistics[0]++;
+                one.statistics[3]++;
+                two.statistics[0]++;
+                two.statistics[3]++;
             }
         }
     }
