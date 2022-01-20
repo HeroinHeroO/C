@@ -1,3 +1,6 @@
+/**
+ * \file
+ * \brief functions header*/
 #ifndef TICTACTOE_BIC2021_FUNCTIONS_H
 #define TICTACTOE_BIC2021_FUNCTIONS_H
 /**
