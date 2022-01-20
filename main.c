@@ -1,13 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 #include "functions.h"
 
+/**
+ *  \brief Global variables that are used in most if not all functions.
+ *
+ * board[3][3] saves the player signs placed on the battlefield.
+ * game_mode is used to select a mode: Player v Player, 2 = Player vs PC, 3 = PC v PC.
+ * player one and two are used to store the players' sign, name and their statistics:
+ * [0]games played, [1]wins, [2]losses, [3]tie games, [4]games with 'X' sign, [5]games with O sign, [6]total signs placed.
+ */
 char board[3][3];
-int game_mode = 0; // 1 = Player v Player, 2 = Player vs PC, 3 = PC v PC.
+int game_mode = 0;
 struct player one = {'X', "Human", 0, 0, 0, 0, 0, 0, 0};
 struct player two = {'O', "MACHINE", 0, 0, 0, 0, 0, 0, 0};
 
+/**
+ * \brief The Game.
+ *
+ * Game loops a sequence of functions as long as the winner variable == whitespace or the free_space function
+ * doesn't return 9 (all fields full).
+ *
+ * Idea for winner variable taken from https://www.usna.edu/Users/cs/roche/courses/s17si204/notes/06/files.php?f=tictactoe.c
+ */
 int main(void) {
 
     srand(time(NULL));
@@ -69,12 +86,6 @@ int main(void) {
     print_player_stats();
     player_stats_save();
     save_board();
+
     return 0;
 }
-
-/* put players in structs
- struct player {
- char sign;
- char name[15];
- int statistics[7]
- }*/

@@ -1,6 +1,9 @@
 #ifndef TICTACTOE_BIC2021_FUNCTIONS_H
 #define TICTACTOE_BIC2021_FUNCTIONS_H
-//external variables - global variables from main.c used in functions
+/**
+ * \brief external variables - global variables from main.c used in functions
+ */
+
 extern char board[3][3];
 extern int game_mode;
 
@@ -23,7 +26,10 @@ struct player {
 extern struct player one;
 extern struct player two;
 
-//function prototypes - see functions.c for detailed decriptions
+/**
+ * \brief function prototypes - see functions.c for detailed decriptions
+ */
+
 void print_player_stats();
 
 void player1_stats_load();
