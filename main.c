@@ -18,8 +18,8 @@
  */
 char board[3][3];
 int game_mode = 0;
-struct player one = {'X', "Human", 0, 0, 0, 0, 0, 0, 0};
-struct player two = {'O', "MACHINE", 0, 0, 0, 0, 0, 0, 0};
+struct player one = {'X', "Human", {0, 0, 0, 0, 0, 0, 0}};
+struct player two = {'O', "MACHINE", {0, 0, 0, 0, 0, 0, 0}};
 
 /**
  * \brief The Game.
