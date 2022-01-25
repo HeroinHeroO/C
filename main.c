@@ -46,7 +46,7 @@ int main(void) {
             player_2_turn();
         }
         winner = who_wins();
-        free_space();
+        //free_space();
         starting_player++;
         starting_player = (starting_player % 2);
 

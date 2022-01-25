@@ -3,6 +3,8 @@
  * \brief functions header*/
 #ifndef TICTACTOE_BIC2021_FUNCTIONS_H
 #define TICTACTOE_BIC2021_FUNCTIONS_H
+#define MAXPRINTLENG 75
+#define MAXPLAYERNAME 15
 /**
  * \brief external variables - global variables from main.c used in functions
  */
@@ -10,19 +12,25 @@
 extern char board[3][3];
 extern int game_mode;
 
+/**
+ * Länge sollte durch ein MAKRO definiert werden!
+ */
 struct logfile {
-    char array1[76];
-    char array2[76];
-    char array3[76];
-    char array4[76];
-    char array5[76];
-    char array6[76];
-    char array7[76];
+    char array1[MAXPRINTLENG];
+    char array2[MAXPRINTLENG];
+    char array3[MAXPRINTLENG];
+    char array4[MAXPRINTLENG];
+    char array5[MAXPRINTLENG];
+    char array6[MAXPRINTLENG];
+    char array7[MAXPRINTLENG];
 };
 
+/**
+ * Länge sollte durch ein MAKRO definiert werden!
+ */
 struct player {
     char sign;
-    char name[15];
+    char name[MAXPLAYERNAME];
     int statistics[7];
 };
 

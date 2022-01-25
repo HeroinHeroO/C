@@ -22,8 +22,9 @@ void player_options() {
     char player_one_sign;
 
     printf("Player One - Enter your name (max. 14 characters):");
-    fgets(one.name, 14, stdin);
+    fgets(one.name, (MAXPLAYERNAME - 1), stdin);
     one.name[strlen(one.name) - 1] = '\0';
+    //while (getchar() != "\n") --> CATCH BUFFER
 
     if (game_mode != 3) {
         player1_stats_load();
@@ -74,7 +75,7 @@ void player_options() {
     }
     if (game_mode == 1) {
         printf("Player Two - Enter your name (max. 14 characters):");
-        fgets(two.name, 14, stdin);
+        fgets(two.name, (MAXPLAYERNAME - 1), stdin);
         two.name[strlen(two.name) - 1] = '\0';
 
         player2_stats_load();
@@ -230,7 +231,7 @@ void player_1_turn() {
     int x = 0, y = 0;
 
     do {
-        ///checks all empty field for number of adjecent (computer) player signs
+        ///checks all empty field for number of adjacent (computer) player signs
         if (game_mode != 3) {
             printf("Player 1: Enter row# and column# seperated by SPACE (1-3):");
             scanf("%d %d", &x, &y);
@@ -334,7 +335,7 @@ void player_1_turn() {
 void player_2_turn() {
     int x, y;
     do {
-        ///checks all empty field for number of adjecent (computer) player signs
+        ///checks all empty field for number of adjacent (computer) player signs
         if (game_mode == 1) {
             printf("Player 2: Enter row# and column# seperated by SPACE (1-3):");
             scanf("%d %d", &x, &y);
@@ -527,12 +528,12 @@ void save_board() {
 
     //fill player names with whitespace to match board length
     int p1end = strlen(one.name) -1;
-    for (int i = 1; i <= (14 - p1end); i++) {
+    for (int i = 1; i <= (MAXPLAYERNAME - 1 - p1end); i++) {
         one.name[p1end + i] = '.';
     }
 
     int p2end = strlen(two.name) -1;
-    for (int i = 1; i <= (14 - p2end); i++) {
+    for (int i = 1; i <= (MAXPLAYERNAME - 1 - p2end); i++) {
         two.name[p2end + i] = '.';
     }
 
@@ -540,23 +541,23 @@ void save_board() {
 
         // scan file for prev. boards and save into struct. Overwrite File if 5 Boards are printed next to each other
 
-        if(strlen(saves->array1) < 75) {
-            fgets(saves->array1, 76, fptr3);
+        if(strlen(saves->array1) < (MAXPRINTLENG)) {
+            fgets(saves->array1, (MAXPRINTLENG + 1), fptr3);
             saves->array1[strlen(saves->array1) - 1] = '\0';
-            fgets(saves->array2, 76, fptr3);
+            fgets(saves->array2, (MAXPRINTLENG + 1), fptr3);
             saves->array2[strlen(saves->array2) - 1] = '\0';
-            fgets(saves->array3, 76, fptr3);
+            fgets(saves->array3, (MAXPRINTLENG + 1), fptr3);
             saves->array3[strlen(saves->array3) - 1] = '\0';
-            fgets(saves->array4, 76, fptr3);
+            fgets(saves->array4, (MAXPRINTLENG + 1), fptr3);
             saves->array4[strlen(saves->array4) - 1] = '\0';
-            fgets(saves->array5, 76, fptr3);
+            fgets(saves->array5, (MAXPRINTLENG + 1), fptr3);
             saves->array5[strlen(saves->array5) - 1] = '\0';
-            fgets(saves->array6, 76, fptr3);
+            fgets(saves->array6, (MAXPRINTLENG + 1), fptr3);
             saves->array6[strlen(saves->array6) - 1] = '\0';
-            fgets(saves->array7, 76, fptr3);
+            fgets(saves->array7, (MAXPRINTLENG + 1), fptr3);
             saves->array7[strlen(saves->array7) - 1] = '\0';
 
-            if (strlen(saves->array1) >= 74) {
+            if (strlen(saves->array1) >= (MAXPRINTLENG - 1)) {
                 memset(saves->array1, 0, strlen(saves->array1));
                 memset(saves->array2, 0, strlen(saves->array2));
                 memset(saves->array3, 0, strlen(saves->array3));
